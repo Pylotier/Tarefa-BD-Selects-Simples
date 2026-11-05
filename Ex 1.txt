@@ -1,0 +1,102 @@
+CREATE DATABASE Projeto
+GO
+USE Projeto
+
+-- Criar tabela Projects 
+CREATE TABLE Projects(
+	ID INT PRIMARY KEY IDENTITY(10001,1),
+	Name VARCHAR(45),
+	Description VARCHAR(45),
+	Date DATE CHECK (Date > '01-09-2014')
+)
+GO
+
+-- Criar tabela Users 
+CREATE TABLE Users(
+	ID INT PRIMARY KEY IDENTITY(1,1),
+	Name VARCHAR(45),
+	Username VARCHAR(45) UNIQUE,
+	Password VARCHAR(45) DEFAULT('123mudar'),
+	Email VARCHAR(45)
+)
+GO
+
+-- Criar tabela Users_has_Projects 
+CREATE TABLE Users_has_Projects(
+	PRIMARY KEY (users_id, projects_id),
+	users_id INT,
+	projects_id INT,
+	FOREIGN KEY (users_id) REFERENCES Users(ID)
+	ON UPDATE CASCADE,
+	FOREIGN KEY (projects_id) REFERENCES Projects(ID)
+	ON UPDATE CASCADE,
+)
+GO
+
+-- Modificar a coluna username da tabela Users para varchar(10)
+ALTER TABLE Users
+ALTER COLUMN Username VARCHAR(10)
+
+-- Modificar a coluna password da tabela Users para varchar(8)
+ALTER TABLE Users
+ALTER COLUMN Password VARCHAR(8)
+
+-- INSERT INTO USERS
+INSERT INTO Users(Name, Username, Email)
+	VALUES('Maria', 'Rh_maria', 'maria@empresa.com')
+
+INSERT INTO Users(Name, Username, Password, Email)
+	VALUES('Paulo', 'Ti_paulo', '123@456','paulo@empresa.com')
+
+INSERT INTO Users(Name, Username, Email)
+	VALUES('Ana','Rh_ana','ana@empresa.com')
+INSERT INTO Users(Name, Username, Email)
+	VALUES('Clara','Ti_clara','clara@empresa.com')
+
+INSERT INTO Users(Name, Username, Password, Email)
+	VALUES('Aparecido', 'Rh_apareci', '55@!cido','aparecido@empresa.com')
+
+-- INSERT INTO PROJETCS
+INSERT INTO Projects(Name, Description, Date) 
+	VALUES('Re-folha', 'Refatora  o das Folhas', '05/09/2014')
+INSERT INTO Projects(Name, Description, Date) 
+	VALUES('Manuten  o PC s', 'Manuten  o PC s', '06/09/2014')
+INSERT INTO Projects(Name, Date) 
+	VALUES('Auditoria', '07/09/2014')
+
+-- INSERT INTO Users_has_projects
+INSERT INTO Users_has_Projects(users_id, projects_id)
+	VALUES(1, 10001)
+INSERT INTO Users_has_Projects(users_id, projects_id)
+	VALUES(5, 10001)
+INSERT INTO Users_has_Projects(users_id, projects_id)
+	VALUES(3, 10003)
+INSERT INTO Users_has_Projects(users_id, projects_id)
+	VALUES(4, 10002)
+INSERT INTO Users_has_Projects(users_id, projects_id)
+	VALUES(2, 10002)
+
+SELECT * FROM Projects
+-- O projeto de Manuten  o atrasou, mudar a data para 12/09/2014
+UPDATE Projects
+SET Date = '12/09/2014'
+WHERE ID = 10002
+
+SELECT * FROM Users
+-- O username de aparecido (usar o nome como condi  o de mudan a) est  feio, 
+-- mudar para Rh_cido
+UPDATE Users
+SET Username = 'Rh_cido'
+WHERE Name = 'Aparecido'
+
+SELECT * FROM Users
+-- Mudar o password do username Rh_maria (usar o username como condi  o de mudan a)
+-- para 888@*, mas a condi  o deve verificar se o password dela ainda   123mudar
+UPDATE Users
+SET Password = '888@*'
+WHERE Username = 'Rh_maria'
+AND Password = '123mudar'
+
+SELECT * FROM Users_has_Projects
+-- O user de id 2 n o participa mais do projeto 10002, remov -lo da associativa
+DELETE FROM Users_has_Projects WHERE users_id = '2'

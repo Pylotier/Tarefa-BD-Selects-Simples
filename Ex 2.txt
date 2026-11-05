@@ -1,0 +1,195 @@
+CREATE DATABASE Locadora_DVD
+GO
+USE Locadora_DVD
+USE Livraria
+CREATE TABLE Filme(
+	ID INT PRIMARY KEY IDENTITY(1001,1),
+	Nome VARCHAR(40) NOT NULL,
+	Ano INT CHECK(Ano <= 2021) NOT NULL
+)
+
+CREATE TABLE DVD(
+	Num INT PRIMARY KEY IDENTITY(10001,1),
+	Data_fabricacao DATE CHECK(Data_fabricacao < GETDATE()),
+	FilmeID INT NOT NULL,
+	FOREIGN KEY (FilmeID) REFERENCES Filme(ID)
+)
+
+CREATE TABLE Estrela(
+	ID INT PRIMARY KEY IDENTITY(9901,1),
+	Nome VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE Filme_Estreal(
+	PRIMARY KEY (FilmeID, EstrelaID),
+	FilmeID INT NOT NULL,
+	EstrelaID INT NOT NULL,
+	FOREIGN KEY (FilmeID) REFERENCES Filme(ID),
+	FOREIGN KEY (EstrelaID) REFERENCES Estrela(ID),
+)
+
+
+CREATE TABLE Cliente(
+	Num_cadastro INT PRIMARY KEY IDENTITY(5501,1),
+	Nome VARCHAR(70) NOT NULL,
+	Logradouro VARCHAR(150) NOT NULL,
+	Num INT CHECK (Num > 0) NOT NULL,
+	CEP CHAR(8) CHECK (LEN(CEP) = 8)
+)
+
+CREATE TABLE Locacao(
+	PRIMARY KEY(DVDNum, ClienteNum_cadastro, Data_locacao),
+	DVDNum INT NOT NULL,
+	ClienteNum_cadastro INT NOT NULL,
+	Data_locacao DATE DEFAULT(GETDATE()) NOT NULL,
+	Data_devolucao DATE NOT NULL,
+	Valor DECIMAL(7,2) CHECK(Valor > 0) NOT NULL,
+
+	CHECK(Data_devolucao > Data_locacao),
+
+	FOREIGN KEY (DVDNum) REFERENCES DVD(Num),
+	FOREIGN KEY (ClienteNum_cadastro) REFERENCES Cliente(Num_cadastro)
+)
+
+--A entidade estrela deveria ter o nome real da estrela, com 50 caracteres
+ALTER TABLE Estrela
+ADD Nome_real VARCHAR(50)
+
+-- Verificando um dos nomes de filme,percebeu-se que o nome do filme
+-- deveria ser um atributo com 80 caracteres
+ALTER TABLE Filme
+ALTER COLUMN Nome VARCHAR(80)
+
+-- Inserir dados na tabela Filme
+INSERT INTO Filme(Nome, Ano) VALUES ('Whiplash', '2015')
+INSERT INTO Filme(Nome, Ano) VALUES ('Birdman', '2015')
+INSERT INTO Filme(Nome, Ano) VALUES ('Interestelar', '2014')
+INSERT INTO Filme(Nome, Ano) VALUES ('A Culpa   das Estrelas', '2014')
+INSERT INTO Filme(Nome, Ano) VALUES ('Alexandre e o Dia Terr vel, Horr vel, Espantosos e Horroroso', '2014')
+INSERT INTO Filme(Nome, Ano) VALUES ('Sing', '2016')
+
+-- Inserir dados na tabela Estreala
+INSERT INTO Estrela(Nome, Nome_real) VALUES ('Michael Keaton', 'Michael John Douglas')
+INSERT INTO Estrela(Nome, Nome_real) VALUES ('Emma Stone', 'Emily Jean Stone')
+INSERT INTO Estrela(Nome) VALUES ('Miles Teller')
+INSERT INTO Estrela(Nome, Nome_real) VALUES ('Steve Carell', 'Steven John Carell')
+INSERT INTO Estrela(Nome, Nome_real) VALUES ('Jennifer Garner', 'Jennifer Anne Garner')
+
+-- Inserir dados na tabela Filme_Estrela
+INSERT INTO Filme_Estreal(FilmeID, EstrelaID) VALUES(1002, 9901)
+INSERT INTO Filme_Estreal(FilmeID, EstrelaID) VALUES(1002, 9902)
+INSERT INTO Filme_Estreal(FilmeID, EstrelaID) VALUES(1001, 9903)
+INSERT INTO Filme_Estreal(FilmeID, EstrelaID) VALUES(1005, 9904)
+INSERT INTO Filme_Estreal(FilmeID, EstrelaID) VALUES(1005, 9905)
+
+-- Inserir dados na tabela DVD
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-12-02', 1001)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2019-10-18', 1002)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-04-03', 1003)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-12-02', 1001)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2019-10-18', 1004)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-04-03', 1002)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-12-02', 1005)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2019-10-18', 1002)
+INSERT INTO DVD(Data_fabricacao, FilmeID) VALUES('2020-04-03', 1003)
+
+-- Inserir dados na tabela Cliente
+INSERT INTO Cliente(Nome, Logradouro, Num, CEP) VALUES('Matilde Luz', 'Rua S ria', 150, '03086040')
+INSERT INTO Cliente(Nome, Logradouro, Num, CEP) VALUES('Carlos Carreiro', 'Rua Bartolomeu Aires', 1250, '04419110')
+INSERT INTO Cliente(Nome, Logradouro, Num) VALUES('Daniel Ramalho', 'Rua Itajutiba', 169)
+INSERT INTO Cliente(Nome, Logradouro, Num) VALUES('Roberta Bento', 'Rua Jayme Von Rosenburg', 36)
+INSERT INTO Cliente(Nome, Logradouro, Num, CEP) VALUES('Rosa Cerqueira', 'Rua Arnaldo Sim es Pinto', 235, '02917110')
+
+-- Inserir dados na tabela Locacao
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10001, 5502, '2021-02-18', '2021-02-21', 3.50)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10009, 5502, '2021-02-18', '2021-02-21', 3.50)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10002, 5503, '2021-02-18', '2021-02-19', 3.50)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10002, 5505, '2021-02-20', '2021-02-23', 3.00)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10004, 5505, '2021-02-20', '2021-02-23', 3.00)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10005, 5505, '2021-02-20', '2021-02-23', 3.00)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10001, 5501, '2021-02-24', '2021-02-26', 3.50)
+INSERT INTO Locacao(DVDNum, ClienteNum_cadastro, Data_locacao, Data_devolucao, Valor) VALUES(10008, 5501, '2021-02-24', '2021-02-26', 3.50)
+
+-- Os CEP dos clientes 5503 e 5504 s o 08411150 e 02918190 respectivamente
+UPDATE Cliente
+SET CEP = '08411150'
+WHERE Num_cadastro = 5503
+
+UPDATE Cliente
+SET CEP = '02918190'
+WHERE Num_cadastro = 5504
+
+-- A loca  o de 2021-02-18 do cliente 5502 teve o valor de 3.25 para cada DVD alugado
+UPDATE Locacao
+SET Valor = 3.25
+WHERE ClienteNum_cadastro = 5502 AND Data_locacao = '2021-02-18'
+
+-- A loca  o de 2021-02-24 do cliente 5501 teve o valor de 3.10 para cada DVD alugado
+UPDATE Locacao
+SET Valor = 3.10
+WHERE ClienteNum_cadastro = 5501 AND Data_locacao = '2021-02-24'
+
+-- O DVD 10005 foi fabricado em 2019-07-14
+UPDATE DVD
+SET Data_fabricacao = '2019-07-14'
+WHERE Num = 10005
+
+-- O nome real de Miles Teller   Miles Alexander Teller
+UPDATE Estrela
+SET Nome_real = 'Miles Alexander Teller'
+WHERE Nome = 'Miles Teller'
+
+-- O filme Sing n o tem DVD cadastrado e deve ser exclu do
+DELETE FROM Filme 
+WHERE Nome = 'Sing'
+
+-- 1) Fazer um select que retorne os nomes dos filmes de 2014
+SELECT Nome, Ano
+FROM Filme
+WHERE Ano = 2014
+
+-- 2) Fazer um select que retorne o id e o ano do filme Birdman
+SELECT ID, Ano
+FROM Filme
+WHERE Nome = 'Birdman'
+
+--3) Fazer um select que retorne o id e o ano do filme
+--que tem o nome terminado por plash
+SELECT ID, Ano
+FROM Filme
+WHERE Nome LIKE '%plash'
+
+-- 4) Fazer um select que retorne o id, o nome e o nome_real
+-- da estrela cujo nome come a com Steve
+SELECT ID, Nome, Nome_real
+FROM Estrela
+WHERE Nome LIKE 'Steve%'
+
+-- 5) Fazer um select que retorne FilmeId e a data_fabrica  o
+-- em formato (DD/MM/YYYY) (apelidar de fab) dos filmes fabricados a partir de 01-01-2020
+SELECT FilmeID, CONVERT(VARCHAR(10), Data_fabricacao, 103) AS 'Fab'
+FROM DVD
+WHERE Data_fabricacao > '01-01-2020'
+
+-- 6) Fazer um select que retorne DVDnum, data_locacao, data_devolucao, valor e valor
+-- com multa de acr scimo de 2.00 da loca  o do cliente 5505
+SELECT DVDNum, Data_locacao, Data_devolucao, Valor, CAST(Valor + 2.00 AS DECIMAL(7,2)) AS Acr scimo
+FROM Locacao
+WHERE ClienteNum_cadastro = 5505
+
+-- 7) Fazer um select que retorne Logradouro, num e CEP de Matilde Luz
+SELECT Logradouro, Num, CEP
+FROM Cliente
+WHERE Nome = 'Matilde Luz'
+
+-- 8) Fazer um select que retorne Nome real de Michael Keaton
+SELECT Nome_real
+FROM Estrela
+WHERE Nome = 'Michael Keaton'
+
+-- Fazer um select que retorne o num_cadastro, o nome e o endere o completo,
+-- concatenando (logradouro, numero e CEP), apelido end_comp, dos clientes cujo ID  
+-- maior ou igual 5503
+SELECT Num_cadastro, Nome, Logradouro + ' ' + CAST(Num AS VARCHAR(10)) + ' ' + CEP  AS 'End_Comp'
+FROM Cliente
+WHERE Num_cadastro >= 5503
